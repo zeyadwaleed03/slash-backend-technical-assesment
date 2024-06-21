@@ -44,6 +44,9 @@ export class CartService {
         },
       });
     } else {
+      if (cartItem.quantity + quantity > product.stock) {
+        throw new BadRequestException('Insufficient product stock.');
+      }
       updatedItem = await this.prisma.cartItem.update({
         where: {
           cartId_productId: {
@@ -89,7 +92,7 @@ export class CartService {
     if (!cartItem) {
       throw new NotFoundException('Product not found in cart.');
     }
-    if (quantity > cartItem.product.stock + cartItem.quantity) {
+    if (quantity > cartItem.product.stock) {
       throw new BadRequestException('Insufficient product stock.');
     }
     const updatedItem = await this.prisma.cartItem.update({

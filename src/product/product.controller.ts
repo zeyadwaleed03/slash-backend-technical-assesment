@@ -18,6 +18,7 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 
@@ -45,6 +46,7 @@ export class ProductController {
     type: CreateProductResponse,
   })
   @ApiBearerAuth()
+  @ApiBadRequestResponse({ description: 'Invalid data provided.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async addProduct(@GetUser() user: User, @Body() dto: ProductDto) {
     return await this.productService.addProduct(user, dto);
@@ -91,6 +93,7 @@ export class ProductController {
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @ApiBearerAuth()
+  @ApiBadRequestResponse({ description: 'Invalid data provided.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async updateProduct(
     @Param('productId', ParseIntPipe) productId: number,

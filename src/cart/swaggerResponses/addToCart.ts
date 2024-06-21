@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CartItem } from '@prisma/client';
+import { CartProduct } from './cartProduct';
 
 export class AddToCartResponse {
   @ApiProperty({
-    example: {
-      cartId: 1,
-      productId: 1,
-      quantity: 2,
-      createdAt: '2023-01-01T00:00:00.000Z',
-      updatedAt: '2023-01-01T00:00:00.000Z',
-    },
+    type: CartProduct,
   })
-  createdItem: CartItem;
+  createdItem: CartProduct;
 
   @ApiProperty({ example: 'Product added to cart successfully.' })
   message: string;

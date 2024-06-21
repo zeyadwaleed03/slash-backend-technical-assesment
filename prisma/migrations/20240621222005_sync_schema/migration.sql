@@ -24,6 +24,7 @@ CREATE TABLE "orders" (
     "status" "OrderStatus" NOT NULL DEFAULT 'pending',
     "totalPrice" DOUBLE PRECISION NOT NULL,
     "userId" INTEGER NOT NULL,
+    "coupon" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "orders_pkey" PRIMARY KEY ("orderId")
 );

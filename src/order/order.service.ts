@@ -21,6 +21,24 @@ export class OrderService {
     if (cartItems.length === 0) {
       throw new NotFoundException(`No items found in the user's cart.`);
     }
+    const updateOperations = cartItems.map(async (cartItem) => {
+      if (cartItem.product.stock >= cartItem.quantity) {
+        await this.prisma.product.update({
+          where: { productId: cartItem.productId },
+          data: {
+            stock: {
+              decrement: cartItem.quantity,
+            },
+          },
+        });
+      } else {
+        throw new NotFoundException(
+          `Product ${cartItem.product.name} does not have enough stock please adjust quantity of product in cart to be less than or equal stock.`,
+        );
+      }
+    });
+
+    await Promise.all(updateOperations);
     let totalPrice = 0;
     const orderItems = cartItems.map((cartItem) => {
       totalPrice += cartItem.product.price * cartItem.quantity;
@@ -45,18 +63,7 @@ export class OrderService {
         },
       },
     });
-    const updateOperations = cartItems.map((cartItem) =>
-      this.prisma.product.update({
-        where: { productId: cartItem.productId },
-        data: {
-          stock: {
-            decrement: cartItem.quantity,
-          },
-        },
-      }),
-    );
 
-    await Promise.all(updateOperations);
     await this.prisma.cartItem.deleteMany({
       where: {
         cartId: user.cartId,
@@ -186,14 +193,19 @@ export class OrderService {
         'Coupon can only be applied to orders with status processing or pending.',
       );
     }
+    let discountedTotalPrice: number;
+    if (order.coupon) {
+      discountedTotalPrice =
+        (order.totalPrice / (1 - order.coupon / 100)) * (1 - coupon / 100);
+    } else {
+      discountedTotalPrice = order.totalPrice * (1 - coupon / 100);
+    }
 
-    const discountedTotalPrice = order.totalPrice * (1 - coupon / 100);
-
-    // Update order with discounted totalPrice
     const updatedOrder = await this.prisma.order.update({
       where: { orderId: order.orderId },
       data: {
         totalPrice: discountedTotalPrice,
+        coupon,
       },
       include: {
         OrderItem: {

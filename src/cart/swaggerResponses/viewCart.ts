@@ -1,16 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CartProduct } from './cartProduct';
+import { CartResponse } from './cartResponse';
 
 export class ViewCartResponse {
-  @ApiProperty({ example: 1 })
-  cartId: number;
-
-  @ApiProperty({ example: 2 })
-  totalQuantity: number;
-
-  @ApiProperty({ type: [CartProduct] })
-  products: CartProduct[];
-
+  @ApiProperty({ type: CartResponse })
+  cart: CartResponse;
   @ApiProperty({ example: 'Cart fetched successfully.' })
   message: string;
 }

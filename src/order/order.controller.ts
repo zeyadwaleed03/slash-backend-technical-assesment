@@ -41,6 +41,7 @@ export class OrderController {
   @UseGuards(JwtGuard)
   @Post()
   @ApiOperation({ summary: 'Create a new order' })
+  @ApiNotFoundResponse({ description: "No items found in the user's cart." })
   @ApiCreatedResponse({
     description: 'Order created successfully.',
     type: createOrderResponse,
@@ -94,7 +95,7 @@ export class OrderController {
   @UseGuards(JwtGuard)
   @Post('apply-coupon')
   @ApiOperation({ summary: 'Apply coupon to the latest order' })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Coupon applied successfully.',
     type: ApplyCouponToOrderResponse,
   })

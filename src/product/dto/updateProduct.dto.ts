@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsString,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateProductDto {
@@ -14,6 +15,7 @@ export class UpdateProductDto {
     type: Number,
     required: false,
   })
+  @ValidateIf((o) => o.price !== undefined)
   @IsNumber()
   price?: number;
 
@@ -23,6 +25,7 @@ export class UpdateProductDto {
     type: Number,
     required: false,
   })
+  @ValidateIf((o) => o.stock !== undefined)
   @IsInt()
   stock?: number;
 
@@ -32,6 +35,7 @@ export class UpdateProductDto {
     type: String,
     required: false,
   })
+  @ValidateIf((o) => o.description !== undefined)
   @IsString()
   @IsNotEmpty()
   @MinLength(5, {
@@ -45,6 +49,7 @@ export class UpdateProductDto {
     type: String,
     required: false,
   })
+  @ValidateIf((o) => o.name !== undefined)
   @IsString()
   @IsNotEmpty()
   @MinLength(3, {
