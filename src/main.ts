@@ -9,7 +9,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
     .setTitle('Order Mangment System.')
-    .setDescription('The cats API description')
+    .setDescription(
+      'Welcome to the Order Management System API documentation. This API provides a comprehensive set of endpoints to manage products, orders, user authentication, shopping carts, and user profiles. Below is an overview of the available endpoints and their functionalities:',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
