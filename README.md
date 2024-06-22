@@ -62,7 +62,8 @@ Ensure to replace the placeholder values with your actual database URL, secret k
 2. **Run database migrations:**
 
    ```bash
-   npx prisma migrate dev
+   npx prisma migrate deploy
+   npx prisma generate
    ```
 
 3. **Start the server:**
