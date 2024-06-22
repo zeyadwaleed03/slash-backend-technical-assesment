@@ -32,7 +32,6 @@ Before you begin, ensure you have the following requirements:
     cd slash-backend-technical-assesment
     ```
 
-    <button onclick="copyToClipboard('git clone https://github.com/zeyadwaleed03/slash-backend-technical-assesment.git\ncd slash-backend-technical-assesment')">Copy Commands</button>
 
 2. **Install dependencies:**
 
