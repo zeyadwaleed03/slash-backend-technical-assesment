@@ -39,7 +39,7 @@ Before you begin, ensure you have the following requirements:
     npm install
     ```
 
-    <button onclick="copyToClipboard('npm install')">Copy Command</button>
+  
 
 ## Setting Up the Environment
 
@@ -64,7 +64,7 @@ Ensure to replace the placeholder values with your actual database URL, secret k
    ```bash
    npx prisma migrate dev
    ```
-<button onclick="copyToClipboard('npx prisma migrate dev')">Copy Command</button>
+
 3. **Start the server:**
 
    ```bash
