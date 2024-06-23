@@ -43,7 +43,7 @@ Before you begin, ensure you have the following requirements:
 
 ## Setting Up the Environment
 
-Create a `.env` file in the `src` folder with the following content:
+Create a `.env` file in the `root` directory of the project with the following content:
 
 ```dotenv
 DATABASE_URL="your-database-url"
