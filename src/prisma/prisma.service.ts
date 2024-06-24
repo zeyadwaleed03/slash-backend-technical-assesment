@@ -13,4 +13,13 @@ export class PrismaService extends PrismaClient {
       },
     });
   }
+  cleanDb() {
+    return this.$transaction([
+      this.cartItem.deleteMany(),
+      this.orderItem.deleteMany(),
+      this.product.deleteMany(),
+      this.order.deleteMany(),
+      this.user.deleteMany(),
+    ]);
+  }
 }

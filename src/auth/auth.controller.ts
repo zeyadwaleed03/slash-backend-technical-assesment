@@ -8,7 +8,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { SignupResponse, LoginResponse } from './swaggerResponses';
 
@@ -43,7 +42,7 @@ export class AuthController {
     description: 'User signed in successfully',
     type: LoginResponse,
   })
-  @ApiUnauthorizedResponse({
+  @ApiForbiddenResponse({
     description: 'Invalid email or password.',
   })
   @HttpCode(HttpStatus.OK)
