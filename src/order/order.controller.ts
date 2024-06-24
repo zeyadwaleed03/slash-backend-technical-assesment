@@ -47,7 +47,6 @@ export class OrderController {
     type: createOrderResponse,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  @ApiBadRequestResponse({ description: "No items found in the user's cart." })
   async createOrder(@GetUser() user: User) {
     return await this.orderService.createOrder(user);
   }

@@ -679,7 +679,33 @@ describe('App e2e', () => {
     });
   });
   describe('Orders', () => {
-    describe('Create order', () => {});
+    describe('Create order', () => {
+      it('should create order for user 1', () => {
+        return pactum
+          .spec()
+          .post('/api/orders')
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(201);
+      });
+      it("should throw not found error for no items found in user's cart", () => {
+        return pactum
+          .spec()
+          .post('/api/orders')
+          .withHeaders({ Authorization: 'Bearer $S{token2}' })
+          .expectStatus(404);
+      });
+      it('should throw not found error for insufficient product stock', () => {
+        return pactum
+          .spec()
+          .post('/api/orders')
+          .withHeaders({ Authorization: 'Bearer $S{token1}' })
+          .expectStatus(404);
+      });
+      it('should throw unauthorized error', () => {
+        return pactum.spec().post('/api/orders').expectStatus(401);
+      });
+    });
     describe('Update order status', () => {});
     describe('View order', () => {});
     describe('Apply coupon to  order', () => {});
