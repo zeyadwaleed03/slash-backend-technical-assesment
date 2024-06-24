@@ -7,6 +7,7 @@ import { LoginDto, SignupDto } from 'src/auth/dto';
 import { ProductDto } from 'src/product/dto';
 import { CartDto } from 'src/cart/dto';
 import { ConfigService } from '@nestjs/config';
+import { OrderCouponDto, OrderStatusDto } from 'src/order/dto';
 pactum.handler.addDataFuncHandler('strToN', (ctx) => {
   return parseInt(ctx.args[0]);
 });
@@ -686,7 +687,8 @@ describe('App e2e', () => {
           .post('/api/orders')
           .withHeaders({ Authorization: 'Bearer $S{token}' })
 
-          .expectStatus(201);
+          .expectStatus(201)
+          .stores('orderId', 'order.orderId');
       });
       it("should throw not found error for no items found in user's cart", () => {
         return pactum
@@ -706,11 +708,179 @@ describe('App e2e', () => {
         return pactum.spec().post('/api/orders').expectStatus(401);
       });
     });
-    describe('Update order status', () => {});
-    describe('View order', () => {});
-    describe('Apply coupon to  order', () => {});
+    describe('Update order status', () => {
+      it('should throw unauthorized error', () => {
+        return pactum
+          .spec()
+          .put('/api/orders/$S{orderId}/status')
+          .expectStatus(401);
+      });
+      it('should updated status of first order to processing for user 1', () => {
+        const dto: OrderStatusDto = {
+          status: 'processing',
+        };
+        return pactum
+          .spec()
+          .put('/api/orders/$S{orderId}/status')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(200);
+      });
+    });
+    describe('View order', () => {
+      it('should throw unauthorized error', () => {
+        return pactum.spec().get('/api/orders/$S{orderId}').expectStatus(401);
+      });
+      it("should throw forbidden error for trying to access order user didn't create", () => {
+        return pactum
+          .spec()
+          .get('/api/orders/$S{orderId}')
+          .withHeaders({ Authorization: 'Bearer $S{token1}' })
+          .expectStatus(403);
+      });
+      it("should throw not found error for trying to access order that doesn't exist", () => {
+        const orderId = pactum.stash.getDataStore('orderId') + 50;
+        return pactum
+          .spec()
+          .get(`/api/orders/${orderId}`)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+          .expectStatus(404);
+      });
+      it('should get first order of user 1', () => {
+        return pactum
+          .spec()
+          .get('/api/orders/$S{orderId}')
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+          .expectStatus(200);
+      });
+    });
+    describe('Apply coupon to  order', () => {
+      it('should throw unauthorized error', () => {
+        return pactum.spec().post('/api/orders/apply-coupon').expectStatus(401);
+      });
+      it('should apply coupon 50% to  first order of user 1', () => {
+        const dto: OrderCouponDto = {
+          coupon: 50,
+        };
+        return pactum
+          .spec()
+          .post('/api/orders/apply-coupon')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(201);
+      });
+      it('should throw bad request error for entering invalid coupon', () => {
+        const dto: OrderCouponDto = {
+          coupon: 99,
+        };
+        return pactum
+          .spec()
+          .post('/api/orders/apply-coupon')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(400);
+      });
+      it('should throw not found error for trying to apply coupon to non existing order', () => {
+        const dto: OrderCouponDto = {
+          coupon: 50,
+        };
+        return pactum
+          .spec()
+          .post('/api/orders/apply-coupon')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token2}' })
+
+          .expectStatus(404);
+      });
+    });
+    describe('update order status', () => {
+      it('should updated status of first order to failed for user 1', () => {
+        const dto: OrderStatusDto = {
+          status: 'failed',
+        };
+        return pactum
+          .spec()
+          .put('/api/orders/$S{orderId}/status')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(200);
+      });
+      it('should thow forbidden error for trying to update status of order with failed status', () => {
+        const dto: OrderStatusDto = {
+          status: 'pending',
+        };
+        return pactum
+          .spec()
+          .put('/api/orders/$S{orderId}/status')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(403);
+      });
+    });
+    describe('Apply coupon to order', () => {
+      it('should throw forbidden error for trying to apply coupon on order in failed status', () => {
+        const dto: OrderCouponDto = {
+          coupon: 50,
+        };
+        return pactum
+          .spec()
+          .post('/api/orders/apply-coupon')
+          .withBody(dto)
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(403);
+      });
+    });
   });
   describe('Users', () => {
-    describe('View user orders', () => {});
+    describe('View user orders', () => {
+      it('should throw unauthorized error', () => {
+        return pactum
+          .spec()
+          .get('/api/users/$S{userId1}/orders')
+          .expectStatus(401);
+      });
+      it('should throw not found error for no orders found for specified user', () => {
+        return pactum
+          .spec()
+          .get('/api/users/$S{userId3}/orders')
+
+          .withHeaders({ Authorization: 'Bearer $S{token2}' })
+
+          .expectStatus(404);
+      });
+      it('should throw not found error for no orders found for specified user', () => {
+        return pactum
+          .spec()
+          .get('/api/users/$S{userId3}/orders')
+
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(404);
+      });
+      it('should get orders of user 1', () => {
+        return pactum
+          .spec()
+          .get('/api/users/$S{userId1}/orders')
+
+          .withHeaders({ Authorization: 'Bearer $S{token2}' })
+
+          .expectStatus(200);
+      });
+      it('should get orders of user 1', () => {
+        return pactum
+          .spec()
+          .get('/api/users/$S{userId1}/orders')
+
+          .withHeaders({ Authorization: 'Bearer $S{token}' })
+
+          .expectStatus(200);
+      });
+    });
   });
 });
